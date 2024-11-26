@@ -1,0 +1,777 @@
+<html><head><base href="." />
+<meta charset="UTF-8">
+<title>Ping Pong Championship - Forgot Password</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #fff;
+    min-height: 100vh;
+  }
+  
+  .top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .user-profile {
+    position: static;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .search-container {
+    flex: 1;
+    max-width: 500px;
+    margin: 0 2rem;
+    position: relative;
+  }
+
+  .search-bar {
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    border: 2px solid #00ff88;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+
+  .search-bar::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .search-bar:focus {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #00ff88;
+    font-size: 1.2rem;
+    pointer-events: none;
+  }
+
+  .notifications {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .notification-icon {
+    position: relative;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #00ff88;
+    transition: transform 0.3s ease;
+  }
+
+  .notification-icon:hover {
+    transform: scale(1.1);
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff3366;
+    color: white;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+    font-weight: bold;
+  }
+
+  .notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: none;
+  }
+
+  .notification-dropdown.active {
+    display: block;
+  }
+
+  .notification-item {
+    padding: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .notification-item:last-child {
+    border-bottom: none;
+  }
+
+  #mainContent {
+    margin-left: 20px;
+    margin-top: 80px;
+    transition: margin-left 0.3s ease;
+  }
+
+  .left-sidebar {
+    position: fixed;
+    left: -250px;
+    top: 80px;
+    bottom: 0;
+    width: 250px;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar-hover-area {
+    position: fixed;
+    left: 0;
+    top: 80px;
+    bottom: 0;
+    width: 20px;
+    z-index: 999;
+  }
+
+  .sidebar-hover-area:hover + .left-sidebar,
+  .left-sidebar:hover {
+    left: 0;
+  }
+
+  .friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .friend-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .friend-item:hover {
+    background: rgba(0, 255, 136, 0.1);
+    transform: translateX(5px);
+  }
+
+  .friend-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #00ff88;
+  }
+
+  .friend-info {
+    flex: 1;
+  }
+
+  .friend-name {
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .friend-status {
+    font-size: 0.8rem;
+    color: #00ff88;
+  }
+
+  .online-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00ff88;
+    margin-left: auto;
+  }
+
+  .logout-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.8rem 2rem;
+    background: #ff3366;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    width: 80%;
+  }
+
+  .logout-btn:hover {
+    background: #ff1f1f;
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
+  }
+
+  header {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  
+  h1 {
+    font-size: 3.5rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes glow {
+    from {
+      text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0073e6, 0 0 20px #0073e6;
+    }
+    to {
+      text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0073e6, 0 0 40px #0073e6;
+    }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  @keyframes success-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  .otp-input {
+    transition: all 0.3s ease;
+    border: 2px solid #00ff88;
+  }
+
+  .otp-input:focus {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+  }
+
+  .otp-input.error {
+    border-color: #ff3366;
+    animation: shake 0.2s ease-in-out;
+  }
+
+  .otp-input.success {
+    border-color: #00ff88;
+    animation: success-pulse 0.5s ease-in-out;
+  }
+
+  .password-field input {
+    transition: all 0.3s ease;
+  }
+
+  .password-field input:focus {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+  }
+
+  .strength-meter {
+    transition: all 0.5s ease;
+  }
+
+  .success-message {
+    animation: success-pulse 1s ease-in-out;
+  }
+
+  .password-requirements li {
+    transition: all 0.3s ease;
+  }
+
+  .password-requirements li.met {
+    color: #00ff88;
+    transform: translateX(10px);
+  }
+
+  .forgot-password-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    text-align: center;
+  }
+
+  .forgot-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .forgot-form input {
+    padding: 1rem;
+    border-radius: 10px;
+    border: 2px solid #00ff88;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+  }
+
+  .forgot-form button {
+    padding: 1rem;
+    background: #00ff88;
+    color: #1a1a2e;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .forgot-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+  }
+
+  .back-to-login {
+    margin-top: 1rem;
+    color: #00ff88;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .back-to-login:hover {
+    text-decoration: underline;
+  }
+
+  .verification-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    text-align: center;
+  }
+
+  .otp-inputs {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+  }
+
+  .otp-input {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    border: 2px solid #00ff88;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .resend-code {
+    color: #00ff88;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    display: inline-block;
+  }
+
+  .resend-code:hover {
+    text-decoration: underline;
+  }
+
+  .new-password-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    text-align: center;
+  }
+
+  .password-requirements {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: left;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+
+  .password-requirements ul {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+
+  .password-requirements li {
+    margin: 0.3rem 0;
+    transition: all 0.3s ease;
+  }
+
+  .password-strength {
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+
+  .strength-meter {
+    height: 100%;
+    width: 0;
+    transition: all 0.3s ease;
+  }
+
+  .password-field {
+    position: relative;
+    width: 100%;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 5px;
+  }
+</style>
+</head>
+<body>
+  <div id="topBar"></div>
+  <div id="leftSidebar"></div>
+  <div id="mainContent"></div>
+
+  <script>
+    function renderTopBar() {
+      const topBarHTML = `
+        <div class="top-bar">
+          <div class="user-profile" onclick="navigateToProfile()">
+            <div class="user-avatar">
+              <img src="https://api.dicebear.com/6.x/avataaars/svg?seed=Felix" alt="user profile avatar, cartoon style" width="50" height="50">
+            </div>
+            <span class="username">PlayerOne</span>
+          </div>
+
+          <div class="search-container">
+            <input type="search" class="search-bar" placeholder="Search players, tournaments, or game modes...">
+            <span class="search-icon">🔍</span>
+          </div>
+          
+          <div class="notifications">
+            <div class="notification-icon">
+              🔔
+              <span class="notification-badge">3</span>
+              <div class="notification-dropdown">
+                <div class="notification-item">
+                  <div>🏆 New challenge from Player2!</div>
+                </div>
+                <div class="notification-item">
+                  <div>🎮 Tournament starting in 5 minutes</div>
+                </div>
+                <div class="notification-item">
+                  <div>⭐ You've reached Level 10!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('topBar').innerHTML = topBarHTML;
+    }
+
+    function renderLeftSidebar() {
+      const leftSidebarHTML = `
+        <div class="sidebar-hover-area"></div>
+        <div class="left-sidebar">
+          <h3>Online Friends</h3>
+          <div class="friends-list">
+            <div class="friend-item">
+              <img class="friend-avatar" src="https://api.dicebear.com/6.x/avataaars/svg?seed=Player2" alt="Player2 avatar" width="40" height="40">
+              <div class="friend-info">
+                <div class="friend-name">Player2</div>
+                <div class="friend-status">In Game</div>
+              </div>
+              <div class="online-indicator"></div>
+            </div>
+            <div class="friend-item">
+              <img class="friend-avatar" src="https://api.dicebear.com/6.x/avataaars/svg?seed=Player3" alt="Player3 avatar" width="40" height="40">
+              <div class="friend-info">
+                <div class="friend-name">Player3</div>
+                <div class="friend-status">Online</div>
+              </div>
+              <div class="online-indicator"></div>
+            </div>
+            <div class="friend-item">
+              <img class="friend-avatar" src="https://api.dicebear.com/6.x/avataaars/svg?seed=Player4" alt="Player4 avatar" width="40" height="40">
+              <div class="friend-info">
+                <div class="friend-name">Player4</div>
+                <div class="friend-status">In Menu</div>
+              </div>
+              <div class="online-indicator"></div>
+            </div>
+          </div>
+          <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+      `;
+      
+      document.getElementById('leftSidebar').innerHTML = leftSidebarHTML;
+    }
+
+    function renderPasswordReset() {
+      const mainContentHTML = `
+        <div class="new-password-container">
+          <h2>Reset Password</h2>
+          <p>Enter the verification code sent to your email</p>
+          
+          <form class="forgot-form" onsubmit="handlePasswordReset(event)">
+            <div class="otp-section">
+              <h3>Verification Code</h3>
+              <div class="otp-inputs">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+              </div>
+            </div>
+            
+            <div class="new-password-section">
+              <h3>New Password</h3>
+              <div class="password-field">
+                <input 
+                  type="password" 
+                  id="newPassword"
+                  placeholder="Enter new password" 
+                  required
+                  onkeyup="checkPasswordStrength(this.value)"
+                >
+                <button type="button" class="toggle-password" onclick="togglePassword('newPassword')">👁️</button>
+              </div>
+              
+              <div class="password-strength">
+                <div class="strength-meter"></div>
+              </div>
+              
+              <div class="password-requirements">
+                <p>Password must contain:</p>
+                <ul id="requirements-list">
+                  <li data-requirement="length">At least 8 characters</li>
+                  <li data-requirement="uppercase">One uppercase letter</li>
+                  <li data-requirement="lowercase">One lowercase letter</li>
+                  <li data-requirement="number">One number</li>
+                  <li data-requirement="special">One special character</li>
+                </ul>
+              </div>
+            </div>
+            
+            <button type="submit">Reset Password</button>
+          </form>
+          
+          <a href="#" class="resend-code" onclick="resendCode(event)">
+            Didn't receive code? Send again
+          </a>
+        </div>
+      `;
+      
+      document.getElementById('mainContent').innerHTML = mainContentHTML;
+      setupOTPInputs();
+    }
+
+    function setupOTPInputs() {
+      const inputs = document.querySelectorAll('.otp-input');
+      
+      inputs.forEach((input, index) => {
+        input.addEventListener('keyup', (e) => {
+          if (e.key >= 0 && e.key <= 9) {
+            input.classList.remove('error');
+            input.classList.add('success');
+            playSuccess();
+            
+            if (index < inputs.length - 1) {
+              inputs[index + 1].focus();
+            }
+            
+            const allFilled = Array.from(inputs).every(input => input.value.length === 1);
+            if (allFilled) {
+              validateOTP();
+            }
+          } else if (e.key === 'Backspace') {
+            input.classList.remove('success');
+            if (index > 0) {
+              inputs[index - 1].focus();
+            }
+          }
+        });
+      });
+    }
+
+    function validateOTP() {
+      const inputs = document.querySelectorAll('.otp-input');
+      const code = Array.from(inputs).map(input => input.value).join('');
+      
+      if (code.length === 6) {
+        inputs.forEach(input => {
+          input.classList.add('success');
+        });
+        document.getElementById('newPassword').focus();
+      }
+    }
+
+    function playSuccess() {
+      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodHag2k0M3al3OiJZi8xhcD/94ZaJzOr/f/kbEAmPPT//85VKj7///+qQipF////hj1GUP///2dNW2D///9Ma3Ju////Psx3gf///zD/hI////8t6l+Y////L7Q8rP///zOhH8D///86mQDU////Q5j24f///0yrz+7///9Xz6H7////aO1qB////3rSPBX///+Hzxkj////lMX7MP///6K8xz7///+xsx9N////wqr2W////9GhymP////gmZpr////75G2ef///wx5hYL///8dcmuK////LV1Tk////z5OOZv///9PQSej////YTQMq////3MnA7P///+EGPe7////lQnlw////6f70cv////A68TT////0tvA3P///+XLvOX////1vLvu////Bvf/////EwAAABgAAAAdAAAAIgAAACcAAAAsAAAAMQAAADYAAAA7AAAAQAAAAEUAAABKAAAATwAAAFQAAABZAAAAXgAAAGMAAABoAAAAbQAAAHIAAAB3AAAAfAAAAIEAAACGAAAAiwAAAJAAAACVAAAAmgAAAJ8AAACkAAAAqQAAAK4AAAC4AAAAvQAAAMIAAADHAAAAzAAAANEAAADWAAAA2wAAAOAAAADlAAAA6gAAAO8AAAD0AAAA+QAAAPoAAAD7AAAA/AAAAPwAAAD9AAAA/gAAAP4AAAD/AAAA/wAAAA==');
+      audio.volume = 0.2;
+      audio.play();
+    }
+
+    function checkPasswordStrength(password) {
+      const strengthMeter = document.querySelector('.strength-meter');
+      const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[^A-Za-z0-9]/.test(password)
+      };
+      
+      Object.entries(requirements).forEach(([req, met]) => {
+        const li = document.querySelector(`[data-requirement="${req}"]`);
+        if (li) {
+          if (met) {
+            li.classList.add('met');
+            playSuccess();
+          } else {
+            li.classList.remove('met');
+          }
+        }
+      });
+      
+      const strength = Object.values(requirements).filter(Boolean).length * 20;
+      
+      strengthMeter.style.width = strength + '%';
+      strengthMeter.style.transition = 'all 0.5s ease';
+      
+      if (strength <= 40) {
+        strengthMeter.style.backgroundColor = '#ff3366';
+      } else if (strength <= 80) {
+        strengthMeter.style.backgroundColor = '#ffd700';
+      } else {
+        strengthMeter.style.backgroundColor = '#00ff88';
+      }
+    }
+
+    function resendCode(event) {
+      event.preventDefault();
+      //('Resending verification code...');
+      
+      const link = event.target;
+      link.textContent = 'Code sent! Try again in 60s';
+      link.style.pointerEvents = 'none';
+      link.style.opacity = '0.7';
+      
+      setTimeout(() => {
+        link.textContent = 'Didn\'t receive code? Send again';
+        link.style.pointerEvents = 'auto';
+        link.style.opacity = '1';
+      }, 60000);
+    }
+
+    function navigateToProfile() {
+      renderProfilePage();
+    }
+
+    function renderUserProfile() {
+      const userData = {
+        username: "PlayerOne",
+        avatarUrl: "https://api.dicebear.com/6.x/avataaars/svg?seed=Felix"
+      };
+      
+      document.querySelector('.username').textContent = userData.username;
+      document.querySelector('.user-avatar img').src = userData.avatarUrl;
+    }
+
+    function renderHomePage() {
+      renderTopBar();
+      renderLeftSidebar();
+      renderPasswordReset();
+      renderUserProfile();
+    }
+
+    function handleLogout() {
+      //('Logging out...');
+      window.location.href = 'https://example.com/login';
+    }
+
+    renderPasswordReset();
+
+    document.querySelectorAll('.btn').forEach(button => {
+      button.addEventListener('mouseover', () => {
+        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodHag2k0M3al3OiJZi8xhcD/94ZaJzOr/f/kbEAmPPT//85VKj7///+qQipF////hj1GUP///2dNW2D///9Ma3Ju////Psx3gf///zD/hI////8t6l+Y////L7Q8rP///zOhH8D///86mQDU////Q5j24f///0yrz+7///9Xz6H7////aO1qB////3rSPBX///+Hzxkj////lMX7MP///6K8xz7///+xsx9N////wqr2W////9GhymP////gmZpr////75G2ef///wx5hYL///8dcmuK////LV1Tk////z5OOZv///9PQSej////YTQMq////3MnA7P///+EGPe7////lQnlw////6f70cv////A68TT////0tvA3P///+XLvOX////1vLvu////Bvf/////EwAAABgAAAAdAAAAIgAAACcAAAAsAAAAMQAAADYAAAA7AAAAQAAAAEUAAABKAAAATwAAAFQAAABZAAAAXgAAAGMAAABoAAAAbQAAAHIAAAB3AAAAfAAAAIEAAACGAAAAiwAAAJAAAACVAAAAmgAAAJ8AAACkAAAAqQAAAK4AAAC4AAAAvQAAAMIAAADHAAAAzAAAANEAAADWAAAA2wAAAOAAAADlAAAA6gAAAO8AAAD0AAAA+QAAAPoAAAD7AAAA/AAAAPwAAAD9AAAA/gAAAP4AAAD/AAAA/wAAAA==');
+        audio.play();
+      });
+    });
+
+    const notificationIcon = document.querySelector('.notification-icon');
+    const notificationDropdown = document.querySelector('.notification-dropdown');
+
+    notificationIcon.addEventListener('click', () => {
+      notificationDropdown.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!notificationIcon.contains(event.target)) {
+        notificationDropdown.classList.remove('active');
+      }
+    });
+
+    const searchBar = document.querySelector('.search-bar');
+    searchBar.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      //('Searching for:', searchTerm);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.friend-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const friendName = item.querySelector('.friend-name').textContent;
+          //(`Opening chat with: ${friendName}`);
+          renderChatView();
+        });
+      });
+    });
+  </script>
+</body></html>
